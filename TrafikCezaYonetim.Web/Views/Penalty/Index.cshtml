@@ -1,0 +1,310 @@
+﻿@using TrafikCezaYonetim.Business.DTOs
+@using TrafikCezaYonetim.Core.Entities
+@using TrafikCezaYonetim.Core.Enums
+@model List<TrafficPenaltyDetailDto>
+
+@{
+    ViewData["Title"] = "Araç Ceza Kayıtları";
+    var vehicles = ViewBag.Vehicles as List<Vehicle> ?? new List<Vehicle>();
+}
+
+<div class="container-fluid p-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="fw-bold mb-0">Araç Ceza Kayıtları</h3>
+            <small class="text-muted">Araçlara kesilen cezaların takibi ve onay süreci yönetimi</small>
+        </div>
+        <button type="button" class="btn text-white px-4 py-2" style="background-color: #6c5ce7; font-weight: 500;" data-bs-toggle="modal" data-bs-target="#newPenaltyModal">
+            + Yeni Ceza Kaydı
+        </button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="text-uppercase fs-7 text-secondary">
+                            <th>Tarih</th>
+                            <th>Plaka / Araç</th>
+                            <th>Sürücü</th>
+                            <th>Makbuz No</th>
+                            <th>Tutar</th>
+                            <th>Ödenecek</th>
+                            <th>Durum</th>
+                            <th class="text-end pe-4">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center py-4 text-muted">Kayıtlı ceza bulunamadı.</td>
+                            </tr>
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.PenaltyDate.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    <div class="fw-bold">@item.PlateNumber</div>
+                                    <small class="text-muted">@item.VehicleName</small>
+                                </td>
+                                <td>@(string.IsNullOrEmpty(item.DriverName) ? "-" : item.DriverName)</td>
+                                <td>@(string.IsNullOrEmpty(item.PenaltyNumber) ? "-" : item.PenaltyNumber)</td>
+                                <td class="text-danger fw-semibold">₺@item.TotalAmount.ToString("N2")</td>
+                                <td class="fw-bold">₺@item.PayableAmount.ToString("N2")</td>
+                                <td>
+                                    @switch (item.Status)
+                                    {
+                                        case PenaltyStatus.Yeni:
+                                            <span class="badge bg-secondary">Yeni</span>
+                                            break;
+                                        case PenaltyStatus.YoneticiOnayinda:
+                                            <span class="badge bg-warning text-dark">Yönetici Onayında</span>
+                                            break;
+                                        case PenaltyStatus.FinansOnayinda:
+                                            <span class="badge bg-info text-dark">Finans Onayında</span>
+                                            break;
+                                        case PenaltyStatus.Tamamlandi:
+                                            <span class="badge bg-success">Tamamlandı</span>
+                                            break;
+                                        case PenaltyStatus.Reddedildi:
+                                            <span class="badge bg-danger">Reddedildi</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="openDetailModal(@item.Id)" title="Detay ve Geçmiş">
+                                        İncele
+                                    </button>
+
+                                    @if (item.Status == PenaltyStatus.YoneticiOnayinda || item.Status == PenaltyStatus.FinansOnayinda)
+                                    {
+                                        <form asp-action="Approve" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Onayla">
+                                                Onayla
+                                            </button>
+                                        </form>
+
+                                        <button class="btn btn-sm btn-outline-danger" onclick="openRejectModal(@item.Id)" title="Reddet">
+                                            Reddet
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="newPenaltyModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Yeni Ceza Kaydı</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Araç *</label>
+                            <select name="VehicleId" class="form-select" required>
+                                <option value="">Araç Seçiniz</option>
+                                @foreach (var v in vehicles)
+                                {
+                                    <option value="@v.Id">@v.PlateNumber - @v.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Sürücü *</label>
+                            <input type="text" name="DriverName" class="form-control" placeholder="Ad Soyad" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ceza Tarihi *</label>
+                            <input type="date" name="PenaltyDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tutanak / Makbuz No</label>
+                            <input type="text" name="PenaltyNumber" class="form-control" placeholder="Makbuz No" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ceza Tutarı (₺) *</label>
+                            <input type="number" step="0.01" id="totalAmountInput" name="TotalAmount" class="form-control" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Erken Ödeme İndirimi (₺)</label>
+                            <input type="number" step="0.01" id="discountInput" name="DiscountAmount" class="form-control" value="0" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ödenecek Tutar (₺)</label>
+                            <input type="text" id="payableDisplay" class="form-control bg-light" readonly value="0.00" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Ceza Konumu / Yeri</label>
+                            <input type="text" name="Location" class="form-control" placeholder="Örn: TEM Otoyolu Gebze Gişeler" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Açıklama</label>
+                            <input type="text" name="Description" class="form-control" placeholder="Ceza maddesi veya ihlal açıklaması" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Notlar</label>
+                            <textarea name="Notes" class="form-control" rows="2" placeholder="Eklemek istediğiniz notlar..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary" style="background-color: #6c5ce7; border: none;">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-danger">Ceza Kaydını Reddet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Reject" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="rejectPenaltyId" name="id" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ret Gerekçesi *</label>
+                        <textarea name="rejectionReason" class="form-control" rows="3" placeholder="En az 10 karakterlik ret açıklaması yazınız..." required minlength="10"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-danger">Reddetmeyi Onayla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Ceza Kaydı ve Onay Geçmişi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card bg-light mb-3 border-0">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <span class="text-muted d-block">Plaka / Araç</span>
+                                <strong id="detPlate"></strong>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="text-muted d-block">Sürücü</span>
+                                <strong id="detDriver"></strong>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="text-muted d-block">Ödenecek Tutar</span>
+                                <strong id="detAmount" class="text-danger fs-5"></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-3">Onay / İşlem Geçmişi (Audit Log)</h6>
+                <div id="historyTimeline" class="list-group"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const totalInput = document.getElementById('totalAmountInput');
+        const discountInput = document.getElementById('discountInput');
+        const payableDisplay = document.getElementById('payableDisplay');
+
+        function calculatePayable() {
+            const total = parseFloat(totalInput.value) || 0;
+            const discount = parseFloat(discountInput.value) || 0;
+            const payable = Math.max(0, total - discount);
+            payableDisplay.value = payable.toFixed(2);
+        }
+
+        if (totalInput && discountInput) {
+            totalInput.addEventListener('input', calculatePayable);
+            discountInput.addEventListener('input', calculatePayable);
+        }
+
+        function openRejectModal(id) {
+            document.getElementById('rejectPenaltyId').value = id;
+            new bootstrap.Modal(document.getElementById('rejectModal')).show();
+        }
+
+        async function openDetailModal(id) {
+            const response = await fetch(`/Penalty/GetDetail/${id}`);
+            if (!response.ok) {
+                alert('Detay bilgisi alınamadı.');
+                return;
+            }
+
+            const data = await response.json();
+            document.getElementById('detPlate').textContent = `${data.plateNumber} (${data.vehicleName})`;
+            document.getElementById('detDriver').textContent = data.driverName || '-';
+            document.getElementById('detAmount').textContent = `₺${data.payableAmount.toFixed(2)}`;
+
+            const historyContainer = document.getElementById('historyTimeline');
+            historyContainer.innerHTML = '';
+
+            if (data.approvalHistories.length === 0) {
+                historyContainer.innerHTML = '<div class="text-muted small">Henüz bir işlem geçmişi bulunmuyor.</div>';
+            } else {
+                data.approvalHistories.forEach(h => {
+                    const date = new Date(h.actionDate).toLocaleString('tr-TR');
+                    const item = document.createElement('div');
+                    item.className = 'list-group-item list-group-item-action flex-column align-items-start border-start border-3 border-primary mb-2 shadow-sm';
+                    item.innerHTML = `
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 fw-bold">${h.actionBy}</h6>
+                            <small class="text-muted">${date}</small>
+                        </div>
+                        <p class="mb-1 text-secondary">${h.comment || 'Açıklama girilmedi.'}</p>
+                    `;
+                    historyContainer.appendChild(item);
+                });
+            }
+
+            new bootstrap.Modal(document.getElementById('detailModal')).show();
+        }
+    </script>
+}
