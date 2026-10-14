@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="TrafikCezaYonetim.Business/TrafikCezaYonetim.Business.csproj" />
+  <Project Path="TrafikCezaYonetim.Core/TrafikCezaYonetim.Core.csproj" />
+  <Project Path="TrafikCezaYonetim.DataAccess/TrafikCezaYonetim.DataAccess.csproj" />
+  <Project Path="TrafikCezaYonetim.Web/TrafikCezaYonetim.Web.csproj" />
+</Solution>
