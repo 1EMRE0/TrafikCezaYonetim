@@ -1,14 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TrafikCezaYonetim.Business.DTOs;
 using TrafikCezaYonetim.Business.Interfaces;
 
 namespace TrafikCezaYonetim.Web.Controllers;
 
+[Authorize]
 public class PenaltyController : Controller
 {
     private readonly ITrafficPenaltyService _penaltyService;
     private readonly IVehicleService _vehicleService;
 
+    
     public PenaltyController(ITrafficPenaltyService penaltyService, IVehicleService vehicleService)
     {
         _penaltyService = penaltyService;

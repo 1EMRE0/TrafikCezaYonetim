@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using TrafikCezaYonetim.Business.Interfaces;
 using TrafikCezaYonetim.Business.Services;
@@ -5,7 +6,7 @@ using TrafikCezaYonetim.DataAccess.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Servisleri Konteynere Ekle (builder.Build()'den ÖNCE olmalı)
+// Servis Kayıtları
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -13,10 +14,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<ITrafficPenaltyService, TrafficPenaltyService>();
-// 2. Uygulamayı İnşa Et
+
+// Cookie Authentication Ayarı
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+
 var app = builder.Build();
 
-// 3. HTTP İstek Hattını Yapılandır
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -25,13 +36,19 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+// Authentication MUTLAKA Authorization'dan önce gelmelidir
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+// Kök adrese gelindiğinde Login ekranına yönlendir
+app.MapGet("/", context => {
+    context.Response.Redirect("/Account/Login");
+    return Task.CompletedTask;
+});
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();
