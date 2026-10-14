@@ -1,0 +1,71 @@
+﻿@using TrafikCezaYonetim.Core.Entities
+@model List<Vehicle>
+
+@{
+    ViewData["Title"] = "Araç Listesi";
+}
+
+<div class="container-fluid px-4 py-3">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-0">Kayıtlı Araç ve Makineler</h4>
+            <small class="text-muted">Filo araçlarının ve tiplerinin listesi</small>
+        </div>
+        <a asp-action="Create" class="btn text-white px-4 py-2 fw-semibold" style="background-color: #008fa0;">
+            <i class="bi bi-plus-lg me-1"></i> Yeni Araç Ekle
+        </a>
+    </div>
+
+    <div class="card border rounded-3 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr class="text-uppercase fs-7 text-secondary">
+                        <th>Plaka</th>
+                        <th>Araç / Makina Adı</th>
+                        <th>Araç Tipi</th>
+                        <th>Marka / Model</th>
+                        <th>Aitlik (Mülkiyet)</th>
+                        <th>Kullanım Tipi</th>
+                        <th>Yakıt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-dark">@v.PlateNumber</td>
+                            <td>@v.Name</td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-secondary border">
+                                    @v.VehicleType?.Name
+                                </span>
+                            </td>
+                            <td>@v.Brand @v.Model</td>
+                            <td>
+                                @if (v.Ownership == "Kiralık")
+                                {
+                                    <span class="badge bg-warning text-dark">Kiralık Araç</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success-subtle text-success">Özmal / Kendi</span>
+                                }
+                            </td>
+                            <td>@v.UsageType</td>
+                            <td>@(string.IsNullOrEmpty(v.FuelType) ? "-" : v.FuelType)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

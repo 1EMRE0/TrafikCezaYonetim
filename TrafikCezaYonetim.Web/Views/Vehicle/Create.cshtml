@@ -1,0 +1,229 @@
+﻿@using TrafikCezaYonetim.Business.DTOs
+@using TrafikCezaYonetim.Core.Entities
+@model VehicleCreateDto
+
+@{
+    ViewData["Title"] = "Yeni Araç/Makina Ekle";
+    var vehicleTypes = ViewBag.VehicleTypes as List<VehicleType> ?? new List<VehicleType>();
+}
+
+<div class="container-fluid px-4 py-3 bg-white border-bottom mb-4">
+    <!-- Breadcrumb Üst Navigasyon -->
+    <div class="d-flex align-items-center text-muted small mb-2">
+        <a asp-action="Index" class="text-decoration-none text-secondary me-3">
+            <i class="bi bi-chevron-left"></i> Geri
+        </a>
+        <a asp-controller="Penalty" asp-action="Index" class="text-decoration-none text-secondary">
+            <i class="bi bi-house-door"></i> Ana Sayfa
+        </a>
+        <span class="mx-2">›</span>
+        <a asp-action="Index" class="text-decoration-none text-secondary">Araçlar</a>
+        <span class="mx-2">›</span>
+        <span class="text-dark fw-semibold">Araç Düzenle</span>
+    </div>
+
+    <div class="d-flex align-items-center mt-3">
+        <a asp-action="Index" class="btn btn-link text-decoration-none text-secondary p-0 me-3">
+            <i class="bi bi-arrow-left fs-5"></i> Geri
+        </a>
+        <div>
+            <h4 class="fw-bold mb-0 text-dark">Yeni Araç/Makina Ekle</h4>
+            <small class="text-muted">Araç bilgilerini doldurun</small>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4">
+    <div class="card border rounded-3 shadow-none p-4 mb-5">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <!-- 1. GENEL BİLGİLER -->
+            <h5 class="fw-bold mb-3 text-dark">Genel Bilgiler</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Araç/Makina Adı *</label>
+                    <input asp-for="Name" class="form-control" placeholder="Örn: Excavator CAT 320" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Tip *</label>
+                    <select asp-for="VehicleTypeId" class="form-select" required>
+                        <option value="">Tip seçin veya arayın...</option>
+                        @foreach (var type in vehicleTypes)
+                        {
+                            <option value="@type.Id">@type.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Kullanım Tipi *</label>
+                    <select asp-for="UsageType" class="form-select">
+                        <option value="KM Bazlı (Araçlar)">KM Bazlı (Araçlar)</option>
+                        <option value="Saat Bazlı (İş Makineleri)">Saat Bazlı (İş Makineleri)</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Aitlik *</label>
+                    <select asp-for="Ownership" class="form-select">
+                        <option value="Kendi">Kendi</option>
+                        <option value="Kiralık">Kiralık</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Marka/Model</label>
+                    <input asp-for="Brand" class="form-control" placeholder="Örn: Caterpillar 320D" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Plaka *</label>
+                    <input asp-for="PlateNumber" class="form-control" placeholder="34 ABC 123" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Seri No</label>
+                    <input asp-for="SerialNumber" class="form-control" placeholder="SN123456" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Model Yılı</label>
+                    <input asp-for="ModelYear" type="number" class="form-control" placeholder="2024" value="2024" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Yakıt Türü</label>
+                    <select asp-for="FuelType" class="form-select">
+                        <option value="">Seçin</option>
+                        <option value="Dizel">Dizel</option>
+                        <option value="Benzin">Benzin</option>
+                        <option value="Hibrit">Hibrit</option>
+                        <option value="Elektrik">Elektrik</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Saatlik/Günlük Ücret</label>
+                    <input asp-for="HourlyDailyRate" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                </div>
+            </div>
+
+            <hr class="my-4 text-muted opacity-25" />
+
+            <!-- 2. SİGORTA VE MUAYENE -->
+            <h5 class="fw-bold mb-3 text-dark">Sigorta ve Muayene</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Sigorta Şirketi</label>
+                    <select asp-for="InsuranceCompany" class="form-select">
+                        <option value="">Sigorta firması seçin veya yazın...</option>
+                        <option value="Anadolu Sigorta">Anadolu Sigorta</option>
+                        <option value="Allianz Sigorta">Allianz Sigorta</option>
+                        <option value="Axa Sigorta">Axa Sigorta</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Poliçe No</label>
+                    <input asp-for="PolicyNumber" class="form-control" placeholder="POL123456" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Sigorta Başlangıç</label>
+                    <input asp-for="InsuranceStartDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Sigorta Bitiş</label>
+                    <input asp-for="InsuranceEndDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Son Muayene Tarihi</label>
+                    <input asp-for="LastInspectionDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Sonraki Muayene</label>
+                    <input asp-for="NextInspectionDate" type="date" class="form-control" />
+                </div>
+            </div>
+
+            <hr class="my-4 text-muted opacity-25" />
+
+            <!-- 3. SATIN ALMA BİLGİLERİ -->
+            <h5 class="fw-bold mb-3 text-dark">Satın Alma Bilgileri</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Satın Alma Tarihi</label>
+                    <input asp-for="PurchaseDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Satın Alma Fiyatı</label>
+                    <input asp-for="PurchasePrice" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label small fw-semibold">Notlar</label>
+                    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Araç hakkında notlar..."></textarea>
+                </div>
+            </div>
+
+            <hr class="my-4 text-muted opacity-25" />
+
+            <!-- 4. EDİNİM BİLGİLERİ -->
+            <h5 class="fw-bold mb-3 text-dark">Edinim Bilgileri</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Edinim Türü</label>
+                    <select asp-for="AcquisitionType" class="form-select">
+                        <option value="Satın Alma">Satın Alma</option>
+                        <option value="Kiralama">Kiralama</option>
+                        <option value="Finansal Kiralama (Leasing)">Finansal Kiralama (Leasing)</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Satın Alma Tarihi</label>
+                    <input type="text" class="form-control bg-light" placeholder="gg.aa.yyyy" disabled />
+                    <small class="text-muted" style="font-size: 0.75rem;">Yukarıdaki "Satın Alma Tarihi" alanından alınır</small>
+                </div>
+            </div>
+
+            <hr class="my-4 text-muted opacity-25" />
+
+            <!-- 5. KASKO BİLGİLERİ -->
+            <h5 class="fw-bold mb-3 text-dark">Kasko Bilgileri</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Kasko Şirketi</label>
+                    <select asp-for="CascoCompany" class="form-select">
+                        <option value="">Kasko firması seçin veya yazın...</option>
+                        <option value="Axa Kasko">Axa Kasko</option>
+                        <option value="Allianz Kasko">Allianz Kasko</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Kasko Poliçe No</label>
+                    <input asp-for="CascoPolicyNumber" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Kasko Primi (₺)</label>
+                    <input asp-for="CascoPremium" type="number" step="0.01" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Kasko Başlangıç</label>
+                    <input type="date" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Kasko Bitiş</label>
+                    <input type="date" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold">Trafik Sigortası Primi (₺)</label>
+                    <input asp-for="TrafficInsurancePremium" type="number" step="0.01" class="form-control" />
+                </div>
+            </div>
+
+            <!-- Bilgilendirme Not Kutusu -->
+            <div class="alert alert-primary bg-primary-subtle border-0 text-primary-emphasis d-flex align-items-center mb-4 py-2 px-3 small rounded-2">
+                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                <span>Araç başta "Atanmamış" olarak kaydedilir. Araç listesinden lokasyona atama yapabilirsiniz.</span>
+            </div>
+
+            <!-- Kaydet / İptal Butonları -->
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2 fw-semibold">İptal</a>
+                <button type="submit" class="btn text-white px-4 py-2 fw-semibold" style="background-color: #008fa0;">
+                    Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TrafikCezaYonetim.Business.DTOs;
 using TrafikCezaYonetim.Core.Entities;
 
 namespace TrafikCezaYonetim.Business.Interfaces
@@ -9,5 +10,7 @@ namespace TrafikCezaYonetim.Business.Interfaces
     {
         Task<List<Vehicle>> GetAllVehiclesAsync();
         Task<Vehicle?> GetVehicleByIdAsync(int id);
+        Task<List<VehicleType>> GetAllVehicleTypesAsync();
+        Task AddVehicleAsync(VehicleCreateDto dto);
     }
 }

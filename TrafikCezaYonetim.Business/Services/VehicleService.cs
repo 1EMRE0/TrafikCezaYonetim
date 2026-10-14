@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TrafikCezaYonetim.Business.DTOs;
 using TrafikCezaYonetim.Business.Interfaces;
 using TrafikCezaYonetim.Core.Entities;
 using TrafikCezaYonetim.DataAccess.Context;
@@ -27,5 +28,33 @@ public class VehicleService : IVehicleService
         return await _context.Vehicles
             .Include(v => v.VehicleType)
             .FirstOrDefaultAsync(v => v.Id == id);
+    }
+
+    public async Task<List<VehicleType>> GetAllVehicleTypesAsync()
+    {
+        return await _context.VehicleTypes
+            .Where(t => t.IsActive)
+            .OrderBy(t => t.Name)
+            .ToListAsync();
+    }
+
+    public async Task AddVehicleAsync(VehicleCreateDto dto)
+    {
+        var vehicle = new Vehicle
+        {
+            Name = dto.Name,
+            VehicleTypeId = dto.VehicleTypeId,
+            PlateNumber = dto.PlateNumber.Trim().ToUpper(),
+            Brand = dto.Brand ?? string.Empty,
+            Model = dto.Model ?? string.Empty,
+            UsageType = dto.UsageType ?? "KM Bazlı (Araçlar)",
+            Ownership = dto.Ownership ?? "Kendi",
+            SerialNumber = dto.SerialNumber,
+            FuelType = dto.FuelType,
+            
+        };
+
+        await _context.Vehicles.AddAsync(vehicle);
+        await _context.SaveChangesAsync();
     }
 }
