@@ -4,16 +4,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace TrafikCezaYonetim.Business.DTOs;
+
 public class VehicleCreateDto
 {
+    public int Id { get; set; }
+
     [Required(ErrorMessage = "Araç/Makina adı zorunludur.")]
     public string Name { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Araç tipi seçilmelidir.")]
     public int VehicleTypeId { get; set; }
 
-    public string? UsageType { get; set; } 
-    public string? Ownership { get; set; } 
+    public string? UsageType { get; set; }
+    public string? Ownership { get; set; }
     public string? Brand { get; set; }
     public string? Model { get; set; }
 
@@ -33,7 +36,7 @@ public class VehicleCreateDto
     public DateTime? LastInspectionDate { get; set; }
     public DateTime? NextInspectionDate { get; set; }
 
-    
+    // Satın Alma & Kasko
     public DateTime? PurchaseDate { get; set; }
     public decimal? PurchasePrice { get; set; }
     public string? Notes { get; set; }

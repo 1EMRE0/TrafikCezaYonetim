@@ -50,11 +50,30 @@ public class VehicleService : IVehicleService
             UsageType = dto.UsageType ?? "KM Bazlı (Araçlar)",
             Ownership = dto.Ownership ?? "Kendi",
             SerialNumber = dto.SerialNumber,
-            FuelType = dto.FuelType,
-            
+            FuelType = dto.FuelType
         };
 
         await _context.Vehicles.AddAsync(vehicle);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateVehicleAsync(VehicleCreateDto dto)
+    {
+        var vehicle = await _context.Vehicles.FindAsync(dto.Id);
+        if (vehicle == null)
+            throw new Exception("Araç bulunamadı.");
+
+        vehicle.Name = dto.Name;
+        vehicle.VehicleTypeId = dto.VehicleTypeId;
+        vehicle.PlateNumber = dto.PlateNumber.Trim().ToUpper();
+        vehicle.Brand = dto.Brand ?? string.Empty;
+        vehicle.Model = dto.Model ?? string.Empty;
+        vehicle.UsageType = dto.UsageType ?? "KM Bazlı (Araçlar)";
+        vehicle.Ownership = dto.Ownership ?? "Kendi";
+        vehicle.SerialNumber = dto.SerialNumber;
+        vehicle.FuelType = dto.FuelType;
+
+        _context.Vehicles.Update(vehicle);
         await _context.SaveChangesAsync();
     }
 }
