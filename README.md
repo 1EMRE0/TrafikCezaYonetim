@@ -88,6 +88,34 @@ Arayüz bileşenleri, renk paleti ve modal pencereleri Miro tasarımlarına sad�
 
 ---
 
+##  Uygulama İçi Ekran Görüntüleri ve Tasarım Uyumu
+
+Sistem arayüzü, Miro üzerinde modellenen akış ve tasarım diline sadık kalınarak geliştirilmiştir.
+
+### 1. Kimlik Doğrulama & Gösterge Paneli
+| Giriş Ekranı | Araç Ceza Kayıtları (Dashboard) |
+| :---: | :---: |
+| ![Giriş](Docs/app-login.png) | ![Dashboard](Docs/app-dashboard.png) |
+
+---
+
+### 2. Araç Yönetimi (Filo & Detay Görünümleri)
+| Araç Listesi | Yeni Ceza Kaydı Ekleme |
+| :---: | :---: |
+| ![Araç Listesi](Docs/app-vehicle-list.png) | ![Ceza Ekleme](Docs/app-penalty-create.png) |
+
+#### Araç Düzenleme ve Detay Formu (3 Aşamalı Görünüm)
+| Genel Bilgiler | Sigorta ve Muayene | Satın Alma ve Kasko |
+| :---: | :---: | :---: |
+| ![Araç Düzenle - 1](Docs/app-vehicle-edit.png) | ![Araç Düzenle - 2](Docs/app-vehicle-edit-2.png) | ![Araç Düzenle - 3](Docs/app-vehicle-edit-3.png) |
+
+---
+
+### 3. Çok Aşamalı Onay Mekanizması & Zaman Çizelgesi (Audit Log Timeline)
+| Yönetici Onayı Aşaması | Finans Onayı & Tamamlanma | Ret Gerekçesi ve İptal |
+| :---: | :---: | :---: |
+| ![Yönetici Onayında](Docs/app-timeline-yonetici.png) | ![Finans Onayı](Docs/app-timeline-finans.png) | ![Reddedildi](Docs/app-timeline-reddedildi.png) |
+
 ##  Kullanılan Teknolojiler
 
 * **Çatı:** .NET Core MVC (C#)[cite: 4]
