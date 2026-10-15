@@ -80,11 +80,11 @@ Arayüz bileşenleri, renk paleti ve modal pencereleri Miro tasarımlarına sad�
 
 | Giriş Ekranı (Login) | Ceza Listesi (Dashboard) |
 | :---: | :---: |
-| ![Giriş](docs/login-mockup.png) | ![Ceza Listesi](docs/dashboard-mockup.png) |
+| ![Giriş](Docs/login-mockup.png) | ![Ceza Listesi](Docs/dashboard-mockup.png) |
 
 | Araç Ekle & Düzenle | Ceza Detay & Zaman Çizelgesi |
 | :---: | :---: |
-| ![Araç Formu](docs/vehicle-edit-mockup.png) | ![Zaman Çizelgesi](docs/audit-timeline-mockup.png) |
+| ![Araç Formu](Docs/vehicle-edit-mockup.png) | ![Zaman Çizelgesi](Docs/audit-timeline-mockup.png) |
 
 ---
 
